@@ -1,0 +1,110 @@
+{% extends "layout.html" %}
+{% block content %}
+<article class="media content-section">
+    <img class="rounded-circle article-img"
+         src="{{ url_for('static', filename='profile_pics/' + post.author.image_file) }}">
+    <div class="media-body">
+        <div class="article-metadata">
+            <a class="mr-2" href="{{ url_for('users.user_posts', username=post.author.username) }}">{{
+                post.author.username }}</a>
+            <small class="text-muted">{{ post.date_posted.strftime('%Y-%m-%d') }}</small>
+            <small id="reading_time" class="text-muted">{{ reading_time }}</small>
+            {% if post.author == current_user %}
+            <div>
+                <a class="btn btn-secondary btn-sm mt-1 mb-1"
+                   href="{{ url_for('posts.update_post', post_id=post.id) }}">Update</a>
+                <button type="button" class="btn btn-danger btn-sm m-1" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                    Delete
+                </button>
+            </div>
+            {% endif %}
+        </div>
+        <h2 class="article-title">{{ post.title }}</h2>
+        <p class="article-content">{{ post.content|safe }}</p>
+        <button id="dislike" class="vote"><i class="fas fa-thumbs-down"></i></button>
+        <button id="like" class="vote"><i class="fas fa-thumbs-up"></i></button>
+        <div class="share-btn-container">
+            <a href="#" class="facebook-btn">
+                <i class="fab fa-facebook"></i>
+            </a>
+
+            <a href="#" class="twitter-btn">
+                <i class="fab fa-twitter"></i>
+            </a>
+
+            <a href="#" class="linkedin-btn">
+                <i class="fab fa-linkedin"></i>
+            </a>
+
+            <a href="#" class="whatsapp-btn">
+                <i class="fab fa-whatsapp"></i>
+            </a>
+        </div>
+    </div>
+</article>
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Delete Post?</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <form action="{{ url_for('posts.delete_post', post_id=post.id) }}" method="POST">
+                    <input class="btn btn-danger" type="submit" value="Delete">
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="content-section">
+    <form method="POST" action="{{ url_for('comments.new_comment', post_id=post.id) }}">
+        {{ form.hidden_tag() }}
+        <fieldset class="form-group">
+            <div class="form-group">
+                Leave a comment!
+
+                {% if form.content.errors %}
+                {{ form.content(class="form-control form-control-lg is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in form.content.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                {{ form.content(class="form-control form-control-lg") }}
+                {% endif %}
+            </div>
+        </fieldset>
+        <div class="form-group">
+            {{ form.submit(class="btn btn-outline-info") }}
+        </div>
+    </form>
+</div>
+All comments ({{ comment_count }})
+{% if comment.post_id == post_id %}
+{% for comment in comment %}
+<article class="media content-section">
+    <div class="media-body">
+        <div class="article-metadata">
+            <small class="text-muted">{{ comment.author.username }} {{ comment.date_posted.strftime('%Y-%m-%d')
+                }}</small>
+        </div>
+        <p class="article-content">{{ comment.content }}</p>
+    </div>
+</article>
+{% endfor %}
+{% endif %}
+{% if post.author.bio %}
+User bio
+<article class="media content-section">
+    <div class="media-body">
+        <p class="article-content">{{ post.author.bio }}</p>
+    </div>
+</article>
+{% endif %}
+{% endblock content %}
