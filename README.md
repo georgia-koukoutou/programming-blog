@@ -55,4 +55,4 @@ The static folder includes a CSS file (used in addition to Bootstrap 5's stylesh
 
 ## Video presentation
 
-You can find a video presentation of the application on: 
+You can find a video presentation of the application on: https://youtu.be/-BRkBzlfQE8 
