@@ -8,25 +8,59 @@ window.onload = (event) => {
     let postUrl = encodeURI(document.location.href);
     let postTitle = encodeURI("Check this out: ");
 
-    facebookBtn.setAttribute(
-    "href",
-    `https://www.facebook.com/sharer.php?u=${postUrl}`
-    );
+    if (facebookBtn) {
+        facebookBtn.setAttribute(
+        "href",
+        `https://www.facebook.com/sharer.php?u=${postUrl}`
+        );
+    }
 
-    twitterBtn.setAttribute(
-    "href",
-    `https://twitter.com/share?url=${postUrl}&text=${postTitle}`
-    );
+    if (twitterBtn) {
+        twitterBtn.setAttribute(
+        "href",
+        `https://twitter.com/share?url=${postUrl}&text=${postTitle}`
+        );
+    }
 
-    linkedinBtn.setAttribute(
-    "href",
-    `https://www.linkedin.com/shareArticle?url=${postUrl}&title=${postTitle}`
-    );
+    if (linkedinBtn) {
+        linkedinBtn.setAttribute(
+        "href",
+        `https://www.linkedin.com/shareArticle?url=${postUrl}&title=${postTitle}`
+        );
+    }
 
-    whatsappBtn.setAttribute(
-    "href",
-    `https://wa.me/?text=${postTitle} ${postUrl}`
-    );
+    if (whatsappBtn) {
+        whatsappBtn.setAttribute(
+        "href",
+        `https://wa.me/?text=${postTitle} ${postUrl}`
+        );
+    }
+
+
+    let mybutton = document.getElementById("btn-back-to-top");
+
+
+    window.onscroll = function () {
+      scrollFunction();
+    };
+
+    function scrollFunction() {
+      if (
+        document.body.scrollTop > 20 ||
+        document.documentElement.scrollTop > 20
+      ) {
+        mybutton.style.display = "block";
+      } else {
+        mybutton.style.display = "none";
+      }
+    }
+
+    mybutton.addEventListener("click", backToTop);
+
+    function backToTop() {
+      document.body.scrollTop = 0;
+      document.documentElement.scrollTop = 0;
+    }
 
 };
 

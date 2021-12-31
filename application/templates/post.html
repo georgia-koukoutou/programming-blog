@@ -1,110 +1,273 @@
 {% extends "layout.html" %}
 {% block content %}
-<article class="media content-section">
-    <img class="rounded-circle article-img"
-         src="{{ url_for('static', filename='profile_pics/' + post.author.image_file) }}">
-    <div class="media-body">
-        <div class="article-metadata">
-            <a class="mr-2" href="{{ url_for('users.user_posts', username=post.author.username) }}">{{
-                post.author.username }}</a>
-            <small class="text-muted">{{ post.date_posted.strftime('%Y-%m-%d') }}</small>
-            <small id="reading_time" class="text-muted">{{ reading_time }}</small>
-            {% if post.author == current_user %}
-            <div>
-                <a class="btn btn-secondary btn-sm mt-1 mb-1"
-                   href="{{ url_for('posts.update_post', post_id=post.id) }}">Update</a>
-                <button type="button" class="btn btn-danger btn-sm m-1" data-bs-toggle="modal" data-bs-target="#deleteModal">
-                    Delete
-                </button>
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="me-2">
+                            <img class="rounded-circle" height="50" width="50"
+                                 src="{{ url_for('static', filename='profile_pics/' + post.author.image_file) }}"
+                                 alt="">
+                        </div>
+                        <div class="ms-2">
+                            <div class="h5 m-0">
+                                <a class="me-2 author"
+                                   href="{{ url_for('users.user_posts', username=post.author.username) }}">{{
+                                    post.author.username }}</a>
+                            </div>
+                            <div class="h7 text-muted">{{ post.date_posted.strftime('%Y-%m-%d') }}</div>
+                        </div>
+                    </div>
+                    <div class="text-muted"><i class="far fa-clock"> {{ reading_time }} </i></div>
+                </div>
+                {% if post.author == current_user %}
+                <hr class="mt-2 mb-2">
+                <div>
+                    <a class="btn btn-primary btn-sm mt-1 mb-1"
+                       href="{{ url_for('posts.update_post', post_id=post.id) }}">Update</a>
+                    <button type="button" class="btn btn-danger btn-sm m-1" data-bs-toggle="modal"
+                            data-bs-target="#deleteModal"> Delete
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <a class="card-link" href="{{ url_for('posts.post', post_id=post.id) }}">
+                    <h5 class="card-title">{{ post.title }}</h5>
+                </a>
+                <p class="card-text">{{ post.content | safe }}</p>
+                {% for tag in tags %}
+                {% if tag|length %}
+                <span class="badge bg-primary"><i class="fas fa-tags"></i> {{ tag }}</span>
+                {% endif %}
+                {% endfor %}
+            </div>
+            <div class="card-footer d-flex justify-content-between align-content-center">
+                <div class="align-items-center d-flex">
+                    <a href="#" class="facebook-btn me-1">
+                        <i class="fab fa-facebook"></i>
+                    </a>
+                    <a href="#" class="twitter-btn me-1">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="#" class="linkedin-btn me-1">
+                        <i class="fab fa-linkedin"></i>
+                    </a>
+                    <a href="#" class="whatsapp-btn">
+                        <i class="fab fa-whatsapp"></i>
+                    </a>
+                </div>
+                <div>
+                    <button id="dislike"
+                            class="btn btn-light vote {{ 'is-voted' if vote is defined and vote.status == False }}">
+                        <i class="fas fa-thumbs-down"></i>
+                        <span class="badge bg-secondary">{{ post_dislikes }}</span>
+                    </button>
+                    <button id="like" class="btn btn-light vote {{ 'is-voted' if vote is defined and vote.status }}">
+                        <i class="fas fa-thumbs-up"></i>
+                        <span class="badge bg-sm bg-secondary">{{ post_likes }}</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <form method="POST" action="{{ url_for('comments.new_comment', post_id=post.id) }}">
+                <div class="card-header">
+                    Leave a comment!
+                </div>
+                <div class="card-body">
+                    {{ form.hidden_tag() }}
+                    <fieldset class="form-group">
+                        <div class="form-group">
+                            {% if form.content.errors %}
+                            {{ form.content(class="form-control form-control-lg is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.content.errors %}
+                                <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            {{ form.content(class="form-control form-control-lg") }}
+                            {% endif %}
+                        </div>
+                    </fieldset>
+                </div>
+                <div class="card-footer">
+                    <div class="form-group mt-1">
+                        {{ form.submit(class="btn btn-sm btn-primary") }}
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                All comments ({{ comment_count }})
+            </div>
+            <div class="card-body">
+                {% if comment.post_id == post_id %}
+                {% for comment in comment %}
+                <article class="media content-section">
+                    <div class="media-body">
+                        <div class="article-metadata">
+                            <small class="text-muted">{{ comment.author.username }} {{
+                                comment.date_posted.strftime('%Y-%m-%d')
+                                }}</small>
+                        </div>
+                        <p class="article-content">{{ comment.content }}</p>
+                    </div>
+                </article>
+                {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        {% if post.author.bio %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="me-2">
+                            <img class="rounded-circle" height="50" width="50"
+                                 src="{{ url_for('static', filename='profile_pics/' + post.author.image_file) }}"
+                                 alt="">
+                        </div>
+                        <div class="ms-2">
+                            <div class="h5 m-0">
+                                <a class="me-2 author"
+                                   href="{{ url_for('users.user_posts', username=post.author.username) }}">{{
+                                    post.author.username }}</a>
+                            </div>
+                            <div class="h7 text-muted">User bio</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="media-body">
+                    <p class="article-content">{{ post.author.bio }}</p>
+                </div>
             </div>
             {% endif %}
         </div>
-        <h2 class="article-title">{{ post.title }}</h2>
-        <p class="article-content">{{ post.content|safe }}</p>
-        <button id="dislike" class="vote"><i class="fas fa-thumbs-down"></i></button>
-        <button id="like" class="vote"><i class="fas fa-thumbs-up"></i></button>
-        <div class="share-btn-container">
-            <a href="#" class="facebook-btn">
-                <i class="fab fa-facebook"></i>
-            </a>
 
-            <a href="#" class="twitter-btn">
-                <i class="fab fa-twitter"></i>
-            </a>
-
-            <a href="#" class="linkedin-btn">
-                <i class="fab fa-linkedin"></i>
-            </a>
-
-            <a href="#" class="whatsapp-btn">
-                <i class="fab fa-whatsapp"></i>
-            </a>
-        </div>
     </div>
-</article>
-<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel"
-     aria-hidden="true">
+</div>
+
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="deleteModalLabel">Delete Post?</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <h5 class="modal-title">Delete post</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete this post?
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 <form action="{{ url_for('posts.delete_post', post_id=post.id) }}" method="POST">
-                    <input class="btn btn-danger" type="submit" value="Delete">
+                    <input class="btn btn-sm btn-danger" type="submit" value="Delete">
+                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancel</button>
                 </form>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="content-section">
-    <form method="POST" action="{{ url_for('comments.new_comment', post_id=post.id) }}">
-        {{ form.hidden_tag() }}
-        <fieldset class="form-group">
-            <div class="form-group">
-                Leave a comment!
 
-                {% if form.content.errors %}
-                {{ form.content(class="form-control form-control-lg is-invalid") }}
-                <div class="invalid-feedback">
-                    {% for error in form.content.errors %}
-                    <span>{{ error }}</span>
-                    {% endfor %}
-                </div>
-                {% else %}
-                {{ form.content(class="form-control form-control-lg") }}
-                {% endif %}
             </div>
-        </fieldset>
-        <div class="form-group">
-            {{ form.submit(class="btn btn-outline-info") }}
         </div>
-    </form>
+    </div>
 </div>
-All comments ({{ comment_count }})
-{% if comment.post_id == post_id %}
-{% for comment in comment %}
-<article class="media content-section">
-    <div class="media-body">
-        <div class="article-metadata">
-            <small class="text-muted">{{ comment.author.username }} {{ comment.date_posted.strftime('%Y-%m-%d')
-                }}</small>
-        </div>
-        <p class="article-content">{{ comment.content }}</p>
-    </div>
-</article>
-{% endfor %}
-{% endif %}
-{% if post.author.bio %}
-User bio
-<article class="media content-section">
-    <div class="media-body">
-        <p class="article-content">{{ post.author.bio }}</p>
-    </div>
-</article>
-{% endif %}
+
+<script>
+(function () {
+
+    var updateCounters = function() {
+
+        const url = "{{ url_for('posts.count_votes', post_id=post.id) }}"
+        fetch(url, {
+          credentials: 'include'
+        }).then(response => response.json())
+        .then(response => {
+            console.log(response);
+            document.getElementById("like").getElementsByTagName("span")[0].innerText = response.likes
+            document.getElementById("dislike").getElementsByTagName("span")[0].innerText = response.dislikes
+        }).catch((error) => {
+            console.error('Error:', error);
+        });
+    };
+
+    document.getElementById("like").addEventListener("click", () => {
+
+        {% if current_user.is_authenticated %}
+        const url = "{{ url_for('posts.vote_post', post_id=post.id) }}"
+        data = {
+            status: true
+        };
+
+        fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify(data)
+        }).then(response => {
+            console.log(response);
+            updateCounters();
+            document.getElementById("dislike").classList.remove('is-voted');
+
+            if (document.getElementById("like").classList.contains('is-voted')) {
+                document.getElementById("like").classList.remove('is-voted');
+            } else {
+                document.getElementById("like").classList.add('is-voted');
+            }
+        }).catch((error) => {
+            console.error('Error:', error);
+        });
+        {% else %}
+        alert("Please log in first!");
+        {% endif %}
+    });
+
+    document.getElementById("dislike").addEventListener("click", () => {
+
+        {% if current_user.is_authenticated %}
+        const url = "{{ url_for('posts.vote_post', post_id=post.id) }}"
+        data = {
+            status: false
+        };
+
+        fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify(data)
+        }).then(response => {
+            console.log(response);
+            updateCounters();
+            document.getElementById("like").classList.remove('is-voted');
+
+            if (document.getElementById("dislike").classList.contains('is-voted')) {
+                document.getElementById("dislike").classList.remove('is-voted');
+            } else {
+                document.getElementById("dislike").classList.add('is-voted');
+            }
+
+        }).catch((error) => {
+            console.error('Error:', error);
+        });
+
+        {% else %}
+        alert("Please log in first!");
+        {% endif %}
+    });
+
+
+})();
+
+
+</script>
 {% endblock content %}

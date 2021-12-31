@@ -303,3 +303,5 @@ modules.xml
 # Cython debug symbols
 
 # End of https://www.toptal.com/developers/gitignore/api/python,flask,pycharm+all
+
+application/site.db

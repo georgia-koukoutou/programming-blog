@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block content %}
 <div class="row">
-    <div class="col-md-8">
+    <div class="col-md-12">
         {% for result in results.items %}
         <div class="card mb-4">
             <div class="card-header">
@@ -30,9 +30,7 @@
                 </a>
                 <p class="card-text">{{ result[0].truncated_content|safe }}</p>
                 {% for tag in result[0].tags_list %}
-                {% if tag|length %}
                 <span class="badge bg-primary"><i class="fas fa-tags"></i> {{ tag }}</span>
-                {% endif %}
                 {% endfor %}
             </div>
             <div class="card-footer d-flex justify-content-between align-content-center">
@@ -65,47 +63,17 @@
         {% for page_num in results.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
         {% if page_num %}
         {% if results.page == page_num %}
-        <a class="btn btn-primary mb-4" href="{{ url_for('main.home', page=page_num) }}">{{ page_num }}</a>
+        <a class="btn btn-primary mb-4" href="{{ url_for('posts.tagged_posts', content=content, page=page_num) }}">{{
+            page_num }}</a>
         {% else %}
-        <a class="btn btn-outline-primary mb-4" href="{{ url_for('main.home', page=page_num) }}">{{ page_num }}</a>
+        <a class="btn btn-outline-primary mb-4"
+           href="{{ url_for('posts.tagged_posts', content=content, page=page_num) }}">{{ page_num }}</a>
         {% endif %}
         {% else %}
         ...
         {% endif %}
         {% endfor %}
     </div>
-    <div class="col-md-4">
-        <div>
-            <script type="text/javascript" src="https://ssl.gstatic.com/trends_nrtr/2790_RC01/embed_loader.js"></script>
-            <script type="text/javascript">
-                 trends.embed.renderExploreWidget("RELATED_QUERIES", {"comparisonItem":[{"keyword":"learn programming","geo":"","time":"today 12-m"}],"category":0,"property":""}, {"exploreQuery":"q=learn%20programming&date=today 12-m","guestPath":"https://trends.google.com:443/trends/embed/"});
-            </script>
-        </div>
-        <div class="card mt-3">
-            <div class="card-header">
-                Most viewed post
-            </div>
-            <div class="card-body most_viewed_post">
-                {% if most_viewed_post is not none %}
-                <p><a class="card-title" href="{{ url_for('posts.post', post_id=most_viewed_post.id) }}">{{ most_viewed_post.title }}</a></p>
-                <p class="card-text text-muted">Posted by: {{ most_viewed_post.author.username }} on {{  most_viewed_post.date_posted.strftime('%Y-%m-%d') }} </p>
-                <a href="{{ url_for('posts.post', post_id=most_viewed_post.id) }}">Read more</a>
-                {% endif %}
-            </div>
-        </div>
-        <div class="card mt-3">
-            <div class="card-header">
-                Most popular tags
-            </div>
-            <div class="card-body tags">
-                <p class="card-text">
-                    {% for tag in most_popular_tags %}
-                    <span class="badge bg-primary"><i class="fas fa-tag"></i> <a class="tags"
-                                                                                href="{{ url_for('posts.tagged_posts', content=tag.content) }}">{{ tag.content }}</a></span></h1>
-                    {% endfor %}
-                </p>
-            </div>
-        </div>
-    </div>
 </div>
+
 {% endblock content %}

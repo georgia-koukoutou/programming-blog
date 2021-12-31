@@ -1,10 +1,13 @@
+import readtime
 from flask import render_template, url_for, flash, redirect, request, Blueprint
 from flask_login import login_user, current_user, logout_user, login_required
+from sqlalchemy import func
+
 from application import db, bcrypt
-from application.models import User, Post
-from application.users.forms import (RegistrationForm, LoginForm, UpdateAccountForm,
-                                   RequestResetForm, ResetPasswordForm)
-from application.users.utils import save_picture, send_reset_email
+from application.models import User, Post, Tag, Comment
+from application.posts.utils import listToString
+from application.users.forms import (RegistrationForm, LoginForm, UpdateAccountForm)
+from application.users.utils import save_picture, truncate_html
 
 users = Blueprint('users', __name__)
 
@@ -73,38 +76,22 @@ def account():
 def user_posts(username):
     page = request.args.get('page', 1, type=int)
     user = User.query.filter_by(username=username).first_or_404()
-    posts = Post.query.filter_by(author=user)\
+
+    subquery = db.session.query(Comment.post_id, func.count(Comment.post_id).label('count'))\
+        .group_by(Comment.post_id)\
+        .subquery()
+
+    results = db.session.query(Post, subquery.c.count)\
+        .filter_by(author=user)\
+        .outerjoin(subquery, subquery.c.post_id == Post.id)\
         .order_by(Post.date_posted.desc())\
         .paginate(page=page, per_page=5)
-    return render_template('user_posts.html', posts=posts, user=user)
 
+    for result in results.items:
+        reading_time = readtime.of_html(result[0].content)
+        result[0].reading_time = reading_time
+        result[0].truncated_content = truncate_html(result[0].content, 500)
+        tags = listToString(Tag.query.filter_by(post_id=result[0].id).all()).split(",")
+        result[0].tags_list = tags
 
-@users.route("/reset_password", methods=['GET', 'POST'])
-def reset_request():
-    if current_user.is_authenticated:
-        return redirect(url_for('main.home'))
-    form = RequestResetForm()
-    if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
-        send_reset_email(user)
-        flash('An email has been sent with instructions to reset your password.', 'info')
-        return redirect(url_for('users.login'))
-    return render_template('reset_request.html', title='Reset Password', form=form)
-
-
-@users.route("/reset_password/<token>", methods=['GET', 'POST'])
-def reset_token(token):
-    if current_user.is_authenticated:
-        return redirect(url_for('main.home'))
-    user = User.verify_reset_token(token)
-    if user is None:
-        flash('That is an invalid or expired token', 'warning')
-        return redirect(url_for('users.reset_request'))
-    form = ResetPasswordForm()
-    if form.validate_on_submit():
-        hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-        user.password = hashed_password
-        db.session.commit()
-        flash('Your password has been updated! You are now able to log in', 'success')
-        return redirect(url_for('users.login'))
-    return render_template('reset_token.html', title='Reset Password', form=form)
+    return render_template('user_posts.html', results=results, user=user, reading_time=reading_time, tags=tags)

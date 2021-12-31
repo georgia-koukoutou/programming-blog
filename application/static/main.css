@@ -1,7 +1,6 @@
 body {
-  background: #efefef;
   color: #333333;
-  padding-top: 5rem;
+  padding-top: 11rem;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -12,16 +11,42 @@ h1, h2, h3, h4, h5, h6 {
   background-color: #caebf2;
 }
 
+.site-header {
+    box-shadow: 0 2px 4px 0 rgb(0 0 0 / 20%);
+}
 .site-header .navbar-nav .nav-link {
   color: #36454f;
 }
 
 .site-header .navbar-nav .nav-link:hover {
-  color: #ff3b3f;
+  color: #0d6efd;
 }
 
 .site-header .navbar-nav .nav-link.active {
   font-weight: 500;
+}
+
+.header-brand {
+    font-family: Pushster;
+    text-align: center;
+    font-size: 2.8rem;
+    --bs-bg-opacity: 1;
+    background-color: rgba(var(--bs-light-rgb),var(--bs-bg-opacity));
+    border-bottom: 1px solid #e3e3e3;
+}
+
+.header-brand > a {
+    color: black;
+    text-decoration: none;
+}
+
+.navbar-nav {
+    flex: 1;
+    justify-content: center;
+}
+
+.navbar-brand {
+    font-family: Pushster;
 }
 
 .content-section {
@@ -79,30 +104,93 @@ a.article-title:hover {
   font-size: 2.5rem;
 }
 
-.fa, .fas {
-  float: right;
-  color: #444444;
-  padding-right: 7px;
+.card-link, .author {
+    color: #444444;
+    text-decoration: none;
+}
+
+.card-title {
+    text-decoration: none;
+    color: #444444;
+}
+
+.card-footer a {
+    text-decoration: none;
+    margin-right: 0.1rem;
+    color: #0d6efd;
+}
+
+.card-footer a > i {
+    color: #0d6efd;
+}
+
+.card-footer a > i:hover {
+    zoom: 1.1;
+}
+
+.card-footer i {
+  vertical-align: middle;
+  color: #6c757d;
+}
+
+.card {
+    box-shadow: 0 2px 4px 0 rgb(0 0 0 / 20%);
 }
 
 .vote {
   float: right;
-  color: #444444;
-  padding-right: 2px;
+  padding-right: 1px;
   border: none;
   background: none;
 }
 
-.vote:hover{
-    color: red;
+.vote i {
+    color: #adb5bd;
+}
+
+.vote:hover > i {
+    color: #0d6efd;;
 }
 
 .vote:focus {
-    outline: none;
+    box-shadow: none;
 }
 
 #reading_time {
     float: right;
 }
 
+.tags, .tags:hover, .tags:visited {
+    color: white;
+    text-decoration: none;
+}
+
+.is-voted > i {
+    color: #0d6efd;;
+}
+
+.is-voted:hover > i {
+    color: #0d6efd;;
+}
+
+.is-voted:focus {
+    outline: none;
+}
+
+footer {
+    --bs-bg-opacity: 1;
+    background-color: rgba(var(--bs-light-rgb),var(--bs-bg-opacity));
+    box-shadow: 0 -2px 4px 0 rgb(0 0 0 / 20%);
+}
+
+#btn-back-to-top {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  display: none;
+}
+
+.bg-secondary {
+    background-color: #adb5bd!important;
+}
 

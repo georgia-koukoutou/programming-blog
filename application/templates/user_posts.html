@@ -1,28 +1,82 @@
 {% extends "layout.html" %}
 {% block content %}
-    <h1 class="mb-3">Posts by {{ user.username }} ({{ posts.total }})</h1>
-    {% for post in posts.items %}
-        <article class="media content-section">
-          <img class="rounded-circle article-img" src="{{ url_for('static', filename='profile_pics/' + post.author.image_file) }}">
-          <div class="media-body">
-            <div class="article-metadata">
-              <a class="mr-2" href="{{ url_for('users.user_posts', username=post.author.username) }}">{{ post.author.username }}</a>
-              <small class="text-muted">{{ post.date_posted.strftime('%Y-%m-%d') }}</small>
+<h4 class="mb-3">Posts by {{ user.username }} ({{ results.total }})</h4>
+
+<div class="row">
+    <div class="col-md-12">
+        {% for result in results.items %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="me-2">
+                            <img class="rounded-circle" height="50" width="50"
+                                 src="{{ url_for('static', filename='profile_pics/' + result[0].author.image_file) }}"
+                                 alt="">
+                        </div>
+                        <div class="ms-2">
+                            <div class="h5 m-0">
+                                <a class="me-2 author"
+                                   href="{{ url_for('users.user_posts', username=result[0].author.username) }}">{{
+                                    result[0].author.username }}</a>
+                            </div>
+                            <div class="h7 text-muted">{{ result[0].date_posted.strftime('%Y-%m-%d') }}</div>
+                        </div>
+                    </div>
+                    <div class="text-muted"><i class="far fa-clock"> {{ result[0].reading_time }} </i></div>
+                </div>
             </div>
-            <h2><a class="article-title" href="{{ url_for('posts.post', post_id=post.id) }}">{{ post.title }}</a></h2>
-            <p class="article-content">{{ post.content }}</p>
-          </div>
-        </article>
-    {% endfor %}
-    {% for page_num in posts.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
-      {% if page_num %}
-        {% if posts.page == page_num %}
-          <a class="btn btn-danger mb-4" href="{{ url_for('users.user_posts', username=user.username, page=page_num) }}">{{ page_num }}</a>
+            <div class="card-body">
+                <a class="card-link" href="{{ url_for('posts.post', post_id=result[0].id) }}">
+                    <h5 class="card-title">{{ result[0].title }}</h5>
+                </a>
+                <p class="card-text">{{ result[0].truncated_content|safe }}</p>
+                {% for tag in result[0].tags_list %}
+                {% if tag|length %}
+                <span class="badge bg-primary"><i class="fas fa-tags"></i> {{ tag }}</span>
+                {% endif %}
+                {% endfor %}
+            </div>
+            <div class="card-footer d-flex justify-content-between align-content-center">
+                <div>
+                    <a href="#" class="facebook-btn">
+                        <i class="fab fa-facebook"></i>
+                    </a>
+                    <a href="#" class="twitter-btn">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="#" class="linkedin-btn">
+                        <i class="fab fa-linkedin"></i>
+                    </a>
+                    <a href="#" class="whatsapp-btn">
+                        <i class="fab fa-whatsapp"></i>
+                    </a>
+                </div>
+                <div>
+                    <i class="far fa-eye icons me-1"> {{ result[0].views }} </i>
+                    {% if result[1] != None %}
+                    <i class="far fa-comments icons"> {{ result[1] }} </i>
+                    {% else %}
+                    <i class="far fa-comments icons"> 0 </i>
+                    {% endif %}
+                </div>
+
+            </div>
+        </div>
+        {% endfor %}
+        {% for page_num in results.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+        {% if page_num %}
+        {% if results.page == page_num %}
+        <a class="btn btn-primary mb-4" href="{{ url_for('users.user_posts', username=user.username, page=page_num) }}">{{
+            page_num }}</a>
         {% else %}
-          <a class="btn btn-outline-danger mb-4" href="{{ url_for('users.user_posts', username=user.username, page=page_num) }}">{{ page_num }}</a>
+        <a class="btn btn-outline-primary mb-4"
+           href="{{ url_for('users.user_posts', username=user.username, page=page_num) }}">{{ page_num }}</a>
         {% endif %}
-      {% else %}
+        {% else %}
         ...
-      {% endif %}
-    {% endfor %}
+        {% endif %}
+        {% endfor %}
+    </div>
+</div>
 {% endblock content %}
