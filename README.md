@@ -11,7 +11,7 @@ Technologies used:
 
 ## How the blog works
 
-To create posts you have to register as a user. During registration you need to enter these fields:
+To create posts you have to register as a user. During registration, you will need to enter these fields:
 
 - Username
 - Email
@@ -19,6 +19,8 @@ To create posts you have to register as a user. During registration you need to 
 - Password confirmation
 
 If the username and the email you entered does not already exist and the two passwords match, an account is created with the information you entered (the password is hashed before it enters the database). You can then log in with your credentials and start posting, commenting and upvoting or downvoting. At any given moment you can change your account information and you can also upload a profile picture or write a bio.
+
+You can also update the content of your posts or even delete them if you changed your mind.
 
 The project is structured using Flak Blueprints to help with organizing code and separating functionality.
 
@@ -34,7 +36,7 @@ The database stores users, posts, comments, tags and upvotes/downvotes. The tabl
 
 ### Models
 
-The models file specifies all the different entities used by the application (users, posts, comments, tags, votes).
+The models file specifies all the different entities used by the application (users, posts, comments, tags, votes) and their relationship.
 
 ### Templates
 
@@ -43,6 +45,34 @@ The templates include all the HTML code for each page of the blog as well as som
 ### Static
 
 The static folder includes a CSS file (used in addition to Bootstrap 5's stylesheet) , a Javascript file and the profile pictures of the users. 
+
+### Extras
+
+Extra features present in the blog.
+
+#### Remember me option
+
+Prevents the user from accidentally being logged out when they close their browser. This is done using the Flask-Login extension, which creates a cookie that will be saved on the user’s computer, and then Flask-Login will automatically restore the user ID from that cookie if it is not in the session.
+
+#### Post reading time calculation
+
+The reading time of each post is calculated using Medium's algorithm, with the help of readtime's library. 
+
+#### WYSIWYG HTML Editor
+
+Helps users create more complex posts, by enabling the use of different font styles and sizes, lists, pictures and various other features.
+
+#### Google trends
+
+Presents the most popular google searches related to programming in general. 
+
+#### Most viewed post
+
+Presents the post with the most views, the name of the author and the date posted, with a direct link to visit the post.
+
+#### Most popular tags
+
+Users can click on each tag and read the posts that have been marked with this specific tag. 
 
 ## How to launch the application
 
