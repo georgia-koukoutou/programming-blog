@@ -19,6 +19,11 @@ posts = Blueprint('posts', __name__)
 @posts.route("/post/new", methods=['GET', 'POST'])
 @login_required
 def new_post():
+
+    if current_user.id != 1:
+        # allow only admin
+        abort(403, description='Not allowed')
+
     form = PostForm()
     if form.validate_on_submit():
         tag_list = stringToTagList(form.tags.data)
@@ -59,6 +64,11 @@ def post(post_id):
 @posts.route("/post/<int:post_id>/update", methods=['GET', 'POST'])
 @login_required
 def update_post(post_id):
+
+    if current_user.id != 1:
+        # allow only admin
+        abort(403, description='Not allowed')
+
     post = Post.query.get_or_404(post_id)
 
     if post.author != current_user:
@@ -86,6 +96,11 @@ def update_post(post_id):
 @posts.route("/post/<int:post_id>/delete", methods=['POST'])
 @login_required
 def delete_post(post_id):
+
+    if current_user.id != 1:
+        # allow only admin
+        abort(403, description='Not allowed')
+
     post = Post.query.get_or_404(post_id)
     if post.author != current_user:
         abort(403)
